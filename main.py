@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
+from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
 import models
@@ -27,6 +28,10 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+QDRANT_HOST = os.getenv("QDRANT_HOST")
+QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 # validate AWS Credentials are set
 if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION]):
@@ -69,6 +74,16 @@ s3_client = boto3.client(
 	region_name=AWS_REGION,
 )
 
+qdrant_client = QdrantClient(
+	url=QDRANT_HOST,
+	api_key=QDRANT_API_KEY,
+)
+
+if qdrant_client.get_collection(collection_name=QDRANT_COLLECTION):
+	pass
+else:
+	qdrant_client.create_collection(collection_name=QDRANT_COLLECTION)
+
 
 class FileUploadBase(BaseModel):
 	file_name: str
@@ -81,7 +96,7 @@ class FileUploadModel(FileUploadBase):
 
 
 def sanitize_filename(filename: str) -> str:
-	"""Sanitize input filename to remove unsafce characters"""
+	"""Sanitize input filename to remove unsafe characters"""
 	return re.sub(r"[^a-zA-Z0-9_.-]", "_", filename)
 
 
