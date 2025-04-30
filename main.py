@@ -103,13 +103,14 @@ async def validate_pdf(file: UploadFile):
 async def upload_file_to_s3(file: UploadFile, bucket: str, s3_key: str) -> str:
 	"""Upload a file to an S3 bucket"""
 	try:
-		content = await file.read()
-		s3_client.put_object(
-			Bucket=bucket,
-			key=s3_key,
-			Body=content,
-			ContentType=file.content_type,
-			ACL="private",
+		s3_client.upload_fileobj(
+			file.file,
+			bucket,
+			s3_key,
+			ExtraArgs={
+				"ContentType": file.content_type,
+				"ACL": "private",
+			},
 		)
 		return s3_key
 	except botocore.exceptions.ClientError as error:
@@ -157,7 +158,7 @@ async def upload_pdf(db: db_dependency, file: UploadFile = File(...)):
 		raise HTTPException(status_code=400, detail="File size exceeds 5MB limit")
 
 	# Generate Unique filename
-	sanitized_name = sanitize_filename(file.file.name)
+	sanitized_name = sanitize_filename(file.filename)
 	unique_file_name = generate_unique_file_name(sanitized_name)
 	s3_key = f"uploads/{unique_file_name}"
 

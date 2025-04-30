@@ -7,8 +7,15 @@ requires-python = ">=3.12"
 dependencies = [
     "boto3>=1.38.5",
     "fastapi[standard]>=0.115.12",
+    "langchain>=0.3.24",
+    "langchain-community>=0.3.23",
+    "langchain-core>=0.3.56",
+    "langchain-openai>=0.3.14",
+    "langchain-qdrant>=0.2.0",
+    "pymupdf>=1.25.5",
     "python-dotenv>=1.1.0",
     "python-multipart>=0.0.20",
+    "qdrant-client>=1.14.2",
     "sqlalchemy>=2.0.40",
     "uvicorn>=0.34.2",
 ]
