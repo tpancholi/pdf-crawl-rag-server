@@ -1,3 +1,6 @@
 .idea
 .DS_Store
 .env
+
+database.db
+__pycache__

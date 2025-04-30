@@ -44,7 +44,7 @@ app.add_middleware(
 
 
 class FileUploadBase(BaseModel):
-	file_name: File
+	file_name: str
 	s3_file_name: str
 
 
